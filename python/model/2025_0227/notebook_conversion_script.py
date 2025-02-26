@@ -6,9 +6,9 @@ A simple script to convert the Jupyter notebook named "main250227.ipynb"
 into a "main.md" Markdown file using nbconvert.
 
 Usage:
-  1. Ensure this script and main250227.ipynb are in the same directory.
-  2. Install nbconvert (if not already): pip install nbconvert
-  3. Run: python3 notebook_conversion_script.py
+    1. Ensure this script and main250227.ipynb are in the same directory.
+    2. Install nbconvert (if not already): pip install nbconvert
+    3. Run: python3 notebook_conversion_script.py
 
 It will produce "main.md" in the current folder upon success.
 """
