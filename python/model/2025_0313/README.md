@@ -1,0 +1,1 @@
+我修改了objective function,换成了clear variable,模型似乎跑不出来，现在出去和周钰棠吃饭，晚上回来再修改，今晚尽量把模型给跑出来，然后再加入Spell
