@@ -1,6 +1,6 @@
 # transition_state.py
 
-from scenarios.deck_example import deck_15, add_card_to_hand
+from scenarios.deck_0 import deck_15, add_card_to_hand
 from solver.slv import run_single_turn  # The function above
 
 def start_turn(hero, deck, hand_list):
