@@ -2,7 +2,7 @@ from classes.minion import Minion
 import random
 
 # A simpler deck with just 5 neutral minions
-simple_deck_5 = [
+deck = [
     Minion("Murloc Raider", "Neutral", [], attack=2, health=1, strat_value=1, mana_cost=1),
     Minion("Bloodfen Raptor", "Neutral", [], attack=3, health=2, strat_value=1, mana_cost=2),
     Minion("River Crocolisk", "Neutral", [], attack=2, health=3, strat_value=1, mana_cost=2),

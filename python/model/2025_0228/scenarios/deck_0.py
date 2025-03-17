@@ -3,7 +3,7 @@
 import random
 from classes.minion import Minion
 
-deck_15 = [
+deck = [
     Minion("Goldshire Footman", "Neutral", ["Taunt"], attack=1, health=2, strat_value=1, mana_cost=1),
     Minion("Murloc Raider", "Neutral", [], attack=2, health=1, strat_value=1, mana_cost=1),
     Minion("Bloodfen Raptor", "Neutral", [], attack=3, health=2, strat_value=1, mana_cost=2),
