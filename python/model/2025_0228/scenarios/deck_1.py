@@ -22,3 +22,4 @@ def add_card_to_hand(deck_list, hand_list):
     if card is not None:
         hand_list.append(card)
     return card
+

@@ -4,9 +4,6 @@ from scenarios.deck_1 import deck, add_card_to_hand
 from solver.slv import run_single_turn  # The function above
 
 def start_turn(hero, deck, hand_list):
-    """
-    Example: draw a card, increment mana, etc.
-    """
     if deck:
         new_card = add_card_to_hand(deck, hand_list)
         print(f"{hero.hero_class} draws: {new_card}")
@@ -14,49 +11,47 @@ def start_turn(hero, deck, hand_list):
 def apply_results(solution, scenario_data):
     """
     Interpret the solver solution from run_single_turn
-    and update your game state (hero health, minion status, etc.).
+    and update the game state (hero health, minion status, etc.).
+    Also print which minion attacked which target.
     """
 
+    # Check solver status
     if solution["status"] != 2:  # 2 => GRB.OPTIMAL
         print("No valid solution. Status:", solution["status"])
         return
 
+    # Print objective value
     print(f"Objective: {solution['objective']}")
 
     # --- Attacks on the enemy hero ---
-    for i, val in solution["x_hero"].items():
-        if val > 0.5:
-            dmg = scenario_data["A"][i]
-            print(f"Minion {i} attacked the hero for {dmg} damage.")
-            # Subtract from the enemy hero's health
-            scenario_data["H_hero"] -= dmg
+    # If x_hero[i] == 1, minion i attacked the hero.
+    if "x_hero" in solution:
+        for i, val in solution["x_hero"].items():
+            if val > 0.5:  # treat as 1
+                dmg = scenario_data["A"][i]
+                print(f"Friendly minion {i} attacked the enemy hero for {dmg} damage.")
+                scenario_data["H_hero"] -= dmg
 
     # --- Attacks on enemy minions ---
-    # Assume solution["x"] is a dict with keys (i, j) -> float
-    # or a nested dict solution["x"][i][j], adjust accordingly
+    # If x[(i, j)] == 1, minion i attacked enemy minion j.
     if "x" in solution:
         for (i, j), val in solution["x"].items():
-            if val > 0.5:
+            if val > 0.5:  # treat as 1
                 dmg = scenario_data["A"][i]
-                print(f"Minion {i} attacked enemy minion {j} for {dmg} damage.")
-                # Subtract from enemy minion's health
+                print(f"Friendly minion {i} attacked enemy minion {j} for {dmg} damage.")
                 scenario_data["Q"][j] -= dmg
 
-    # (Optional) Check if enemy minions died, etc.
-    # That depends on how you handle "dead" minions:
-    #  if scenario_data["Q"][j] <= 0, then minion j is dead.
-
-    # For demonstration: print updated health
+    # Optionally print the final health states:
     print(f"Enemy hero health is now {scenario_data['H_hero']}.")
     if scenario_data["H_hero"] <= 0:
-        print("Enemy hero has died!")
+        print("The enemy hero has died!")
 
+    # Check each enemy minion's health
     for j, health in enumerate(scenario_data["Q"]):
         print(f"Enemy minion {j} health: {health}")
         if health <= 0:
-            print(f"Enemy minion {j} has died.")
+            print(f"Enemy minion {j} has died (health <= 0).")
 
-    # etc...
 
 
 def end_turn(hero, opponent_hero):
