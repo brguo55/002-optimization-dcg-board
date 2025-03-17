@@ -33,9 +33,10 @@ def apply_results(solution, scenario_data):
                 scenario_data["H_hero"] -= dmg
 
     # --- Attacks on enemy minions ---
-    # If x[(i, j)] == 1, minion i attacked enemy minion j.
-    if "x" in solution:
-        for (i, j), val in solution["x"].items():
+    # If x_minions[(i, j)] == 1, minion i attacked enemy minion j.
+    # (Note: the key is "x_minions", not "x")
+    if "x_minions" in solution:
+        for (i, j), val in solution["x_minions"].items():
             if val > 0.5:  # treat as 1
                 dmg = scenario_data["A"][i]
                 print(f"Friendly minion {i} attacked enemy minion {j} for {dmg} damage.")
@@ -51,6 +52,7 @@ def apply_results(solution, scenario_data):
         print(f"Enemy minion {j} health: {health}")
         if health <= 0:
             print(f"Enemy minion {j} has died (health <= 0).")
+
 
 
 

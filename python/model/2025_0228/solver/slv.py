@@ -126,7 +126,7 @@ def run_single_turn(
     for i in range(m):
         for j_ in range(n):
             model.addConstr(
-                y[i] <= 1 - ((P[j_] - B[i] + 1) / max(P[j_], 1)) * x[i, j_],
+                y[i] <= 1 - ((P[j_] - B[i] + 1) / max(P[j_], 1)) * x[i,j_],
                 name=f"FriendlyMinionSurvival_{i}_{j_}"
             )
 
