@@ -55,10 +55,10 @@ def run_single_turn(
             "W2": 9,
             "W3": 8,
             "W4": 7,
-            "W5": 6,
-            "W6": 5,
-            "W7": 4,
-            "W8": 3
+            "W5": 2,
+            "W6": 6,
+            "W7": 1,
+            "W8": 4
         }
 
     W1 = weights["W1"]
@@ -83,33 +83,34 @@ def run_single_turn(
     c_ = model.addVar(vtype=GRB.BINARY, name="c_clear")            # board clear indicator (1 if all enemy minions dead)
 
     # 3) Objective Function
-    #    Just as an example, referencing the same terms you had before
     objective = (
-        # (1) + W1 * z_hero
-        W1 * z_hero
+    #  --> If z_hero=0 (hero dead), this adds +W1 to the objective.
+    #      If z_hero=1 (hero alive), this adds +0.
+    W1 * (1 - z_hero)
 
-        # (2) + W2 * c_
-        + W2 * c_
+    # (2) + W2 * c_
+    + W2 * c_
 
-        # (3) + W3 * sum(A[i] * x_hero[i])
-        + W3 * gp.quicksum(A[i] * x_hero[i] for i in range(m+h))
+    # (3) + W3 * sum(A[i] * x_hero[i])
+    + W3 * gp.quicksum(A[i] * x_hero[i] for i in range(m+h))
 
-        # (4) - W4 * sum(P[j] * z[j])
-        - W4 * gp.quicksum(P[j] * z[j] for j in range(n))
+    # (4) - W4 * sum(P[j] * z[j])
+    - W4 * gp.quicksum(P[j] * z[j] for j in range(n))
 
-        # (5) + W5 * sum(B[i] * y[i])
-        + W5 * gp.quicksum(B[i] * y[i] for i in range(m+h))
+    # (5) + W5 * sum(B[i] * y[i])
+    + W5 * gp.quicksum(B[i] * y[i] for i in range(m+h))
 
-        # (6) + W6 * sum(A[i] * x[i, j])
-        + W6 * gp.quicksum(A[i] * x[i, j] for i in range(m+h) for j in range(n))
+    # (6) + W6 * sum(A[i] * x[i, j])
+    + W6 * gp.quicksum(A[i] * x[i, j] for i in range(m+h) for j in range(n))
 
-        # (7) - W7 * sum(P[j] * x[i, j])
-        - W7 * gp.quicksum(P[j] * x[i, j] for i in range(m+h) for j in range(n))
+    # (7) - W7 * sum(P[j] * x[i, j])
+    - W7 * gp.quicksum(P[j] * x[i, j] for i in range(m+h) for j in range(n))
 
-        # (8) + W8 * sum(S[k] * u[k])
-        + W8 * gp.quicksum(S[k] * u[k] for k in range(h))
-    )
+    # (8) + W8 * sum(S[k] * u[k])
+    + W8 * gp.quicksum(S[k] * u[k] for k in range(h))
+)
     model.setObjective(objective, GRB.MAXIMIZE)
+
 
     # 4) Constraints
 
