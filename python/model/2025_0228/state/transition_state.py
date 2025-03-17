@@ -12,7 +12,7 @@ def apply_results(solution, scenario_data):
     """
     Interpret the solver solution from run_single_turn
     and update the game state (hero health, minion status, etc.).
-    Also print which minion attacked which target.
+    Also print which minion attacked which target and final statuses.
     """
 
     # Check solver status
@@ -24,7 +24,6 @@ def apply_results(solution, scenario_data):
     print(f"Objective: {solution['objective']}")
 
     # --- Attacks on the enemy hero ---
-    # If x_hero[i] == 1, minion i attacked the hero.
     if "x_hero" in solution:
         for i, val in solution["x_hero"].items():
             if val > 0.5:  # treat as 1
@@ -33,8 +32,6 @@ def apply_results(solution, scenario_data):
                 scenario_data["H_hero"] -= dmg
 
     # --- Attacks on enemy minions ---
-    # If x_minions[(i, j)] == 1, minion i attacked enemy minion j.
-    # (Note: the key is "x_minions", not "x")
     if "x_minions" in solution:
         for (i, j), val in solution["x_minions"].items():
             if val > 0.5:  # treat as 1
@@ -42,19 +39,42 @@ def apply_results(solution, scenario_data):
                 print(f"Friendly minion {i} attacked enemy minion {j} for {dmg} damage.")
                 scenario_data["Q"][j] -= dmg
 
-    # Optionally print the final health states:
+    # --- Print final enemy hero health ---
     print(f"Enemy hero health is now {scenario_data['H_hero']}.")
     if scenario_data["H_hero"] <= 0:
         print("The enemy hero has died!")
 
-    # Check each enemy minion's health
+    # --- Print final enemy minion health ---
     for j, health in enumerate(scenario_data["Q"]):
         print(f"Enemy minion {j} health: {health}")
         if health <= 0:
             print(f"Enemy minion {j} has died (health <= 0).")
 
+    # --- Print which friendly minions survived ---
+    # 'y_survive' is a dict { i: 0/1 } for each friendly (or newly played) minion
+    if "y_survive" in solution:
+        print("\nFriendly minions after combat:")
+        for i, alive_val in solution["y_survive"].items():
+            if alive_val > 0.5:
+                # Because we don't track partial health for friendly side in the solver,
+                # we can only show original Attack/Health from scenario_data:
+                atk = scenario_data["A"][i]
+                hp = scenario_data["B"][i]
+                print(f"  Friendly minion {i} survived with Attack={atk}, Health={hp}.")
+            else:
+                print(f"  Friendly minion {i} did NOT survive (y_survive[{i}] = 0).")
 
-
+    # --- Print which enemy minions are alive (based on z_enemy) ---
+    # 'z_enemy' is a dict { j: 0/1 } for each enemy minion
+    if "z_enemy" in solution:
+        print("\nEnemy minions after combat:")
+        for j, z_val in solution["z_enemy"].items():
+            if z_val > 0.5:
+                # That means this enemy minion ended up "alive" in the solver's model
+                print(f"  Enemy minion {j} is still alive (z_enemy[{j}] = 1), "
+                      f"updated Health={scenario_data['Q'][j]}.")
+            else:
+                print(f"  Enemy minion {j} is considered dead (z_enemy[{j}] = 0).")
 
 def end_turn(hero, opponent_hero):
     """
